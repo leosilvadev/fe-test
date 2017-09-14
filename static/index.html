@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+</head>
+<body>
+<h1>Hello World!</h1>
+<div id="future"></div>
+<form id="form" id="chat_form">
+  <input id="txt_movie_name" type="text">
+  <input id="btn_find_listen" type="button" value="Find and listen to">
+  <div>
+    <ol id="movie_list">
+    </ol>
+  </div>
+</form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script>
+  $(function(){
+    var socket = io('http://localhost:5000');
+    socket.on('connect', function() {
+      console.log('Connected');
+    });
+
+    socket.on('videos.new', function(video) {
+      console.log('new video', video);
+    });
+
+    socket.on('disconnect', function() {
+      console.log('disconnected');
+    });
+
+    $('#btn_find_listen').on('click', function() {
+      var movieList = $('#movie_list');
+      movieList.html('');
+      var name = $('#txt_movie_name').val();
+      $('#btn_find_listen').attr('disabled', true);
+      $.getJSON('http://localhost:5000/api/v1/movies/' + name, function(movie) {
+        movieList.append('<li>' + JSON.stringify(movie) + '</li>');
+        socket.on('movies.' + name, function(data) {
+          var event = JSON.parse(data);
+          if (event.status === 'active') {
+            movieList.append('<li>' + data + '</li>');
+          } else if (event.status === 'terminated') {
+            $('#btn_find_listen').attr('disabled', false);
+          }
+        });
+      });
+    });
+  });
+</script>
+</body>
+</html>
