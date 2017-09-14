@@ -1,46 +1,91 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <style>
+    .movie {
+      padding: 20px 5px 20px 5px;
+    }
+    .movie:nth-of-type(even) {
+      background: #f5f5f5;
+    }
 
+    #panel_movies_found > .panel-body {
+      padding-top: 0px;
+      padding-bottom: 0px;
+    }
+  </style>
 </head>
 <body>
-<h1>Movies!</h1>
-<form id="form" id="chat_form">
-  <input id="txt_movie_name" type="text">
-  <input id="btn_find_listen" type="button" value="Find and listen to">
-  <div>
-    <ol id="movie_list">
-    </ol>
+<div class="container">
+  <div class="well" style="text-align: center">
+    <h1>Movies!</h1>
   </div>
-</form>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      Search for your favorite movies here!
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-8">
+          <input id="txt_movie_name" class="form-control" type="text">
+        </div>
+        <div class="col-sm-4">
+          <input id="btn_find_listen" type="button" value="Search" class="btn btn-primary" style="width: 100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default" id="panel_movies_found">
+    <div class="panel-heading">
+      Movies found
+    </div>
+    <div class="panel-body">
+      <div id="movie_list">
+      </div>
+    </div>
+  </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 <script>
-  $(function(){
+  $(function () {
+    $('#panel_movies_found').hide();
     var socket = io('https://sbot-fe-test.herokuapp.com');
-    socket.on('connect', function() {
+    socket.on('connect', function () {
       console.log('Connected');
     });
 
-    socket.on('videos.new', function(video) {
+    socket.on('videos.new', function (video) {
       console.log('new video', video);
     });
 
-    socket.on('disconnect', function() {
+    socket.on('disconnect', function () {
       console.log('disconnected');
     });
 
-    $('#btn_find_listen').on('click', function() {
+    function addMovie(container, movie) {
+      container.append('<div class="row movie">' +
+          '<div class="col-sm-4">' + movie.original_title + '</div>' +
+          '<div class="col-sm-8">' + movie.overview + '</div>' +
+          '</div>');
+    }
+
+    $('#btn_find_listen').on('click', function () {
       var movieList = $('#movie_list');
       movieList.html('');
       var name = $('#txt_movie_name').val();
       $('#btn_find_listen').attr('disabled', true);
-      $.getJSON('https://sbot-fe-test.herokuapp.com/api/v1/movies/' + name, function(movie) {
-        movieList.append('<li>' + JSON.stringify(movie) + '</li>');
-        socket.on('movies.' + name, function(data) {
+      $('#panel_movies_found').hide();
+      $.getJSON('https://sbot-fe-test.herokuapp.com/api/v1/movies/' + name, function (movie) {
+        $('#panel_movies_found').show();
+        addMovie(movieList, movie);
+        socket.on('movies.' + name, function (data) {
           var event = JSON.parse(data);
           if (event.status === 'active') {
-            movieList.append('<li>' + data + '</li>');
+            addMovie(movieList, event);
           } else if (event.status === 'terminated') {
             $('#btn_find_listen').attr('disabled', false);
           }
