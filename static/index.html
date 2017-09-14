@@ -18,7 +18,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 <script>
   $(function(){
-    var socket = io('http://localhost:5000');
+    var socket = io('https://sbot-fe-test.herokuapp.com');
     socket.on('connect', function() {
       console.log('Connected');
     });
@@ -36,7 +36,7 @@
       movieList.html('');
       var name = $('#txt_movie_name').val();
       $('#btn_find_listen').attr('disabled', true);
-      $.getJSON('http://localhost:5000/api/v1/movies/' + name, function(movie) {
+      $.getJSON('https://sbot-fe-test.herokuapp.com/api/v1/movies/' + name, function(movie) {
         movieList.append('<li>' + JSON.stringify(movie) + '</li>');
         socket.on('movies.' + name, function(data) {
           var event = JSON.parse(data);
