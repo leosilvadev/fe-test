@@ -1,12 +1,15 @@
 const express = require('express');
+const cors = require('cors')
 const app = express();
 const request = require('request');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
-const API_KEY = '0714c627ae31abc90d4f66f2b1da6e2f';
+const API_KEY = process.env.API_KEY;
 const API_BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+
+app.use(cors());
 
 app.get('/api/v1/movies/:name', (req, res) => {
   const name = req.params.name;
@@ -37,7 +40,11 @@ const publishNewMovie = (name, movies) => {
   }
 };
 
-app.get('/test.html', function(req, res,next) {
+app.get('/test.html', function(req, res) {
+  res.sendFile(__dirname + '/static/test.html');
+});
+
+app.get('/', function(req, res) {
   res.sendFile(__dirname + '/static/index.html');
 });
 
