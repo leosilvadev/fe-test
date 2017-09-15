@@ -77,7 +77,7 @@
       movieList.html('');
       var name = $('#txt_movie_name').val();
       $('#panel_movies_found').hide();
-      $.getJSON('https://sbot-fe-test.herokuapp.com/api/v1/movies/' + name, function (movie) {
+      $.getJSON('https://sbot-fe-test.herokuapp.com/api/v1/movies?query=' + name, function (movie) {
         if (movie && movie.listening_token) {
           $('#btn_find_listen').attr('disabled', true);
           $('#panel_movies_found').show();
