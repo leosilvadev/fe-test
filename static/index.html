@@ -15,10 +15,13 @@
       </div>
       <div class="panel-body">
         <div>
-          Show all the movies by name:
+          Show all the movies by query search:
         </div>
         <div>
-          GET https://sbot-fe-test.herokuapp.com/api/v1/movies/{name}
+          GET https://sbot-fe-test.herokuapp.com/api/v1/movies?query={query}
+        </div>
+        <div>
+          <b>The result is one movie with a listening_token in the body, you should use this token to listen to new movies for your search</b>
         </div>
       </div>
     </div>
@@ -29,11 +32,11 @@
       </div>
       <div class="panel-body">
         <div>
-          After try to find for a movie, the api will start to publish the results on the a ws channel:
+          After try to find for a movie, the api will start to publish the results on the a ws channel with your listening_token:
         </div>
         <div>
           Ex.: if you was searching for rambo. <br/><br/>
-          Then you should listen in channel: <b>movies.rambo</b>
+          Then you should listen in channel: <b>movies.{listening_token}</b>
         </div>
         <br/>
         <div>
