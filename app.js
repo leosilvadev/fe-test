@@ -13,8 +13,9 @@ const IMG_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 app.use(cors());
 
 app.get('/api/v1/movies', (req, res) => {
-  const query = req.query.name;
-  if (query === null || query === '') {
+  const query = req.query.query;
+  console.log(query)
+  if (query === undefined || query === '') {
     res.json({});
     return;
   }
