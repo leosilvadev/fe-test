@@ -14,14 +14,13 @@ app.use(cors());
 
 app.get('/api/v1/movies', (req, res) => {
   const query = req.query.query;
-  console.log(query)
   if (query === undefined || query === '') {
     res.json({});
     return;
   }
 
   request(`${API_BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}`, (error, response, body) => {
-    const token = require('uuid/v4');
+    const token = uuidv4();
     const movies = JSON.parse(body).results.map(movie => {
       movie.full_poster_path = `${IMG_BASE_URL}/${movie.poster_path}`;
       movie.full_backdrop_path = `${IMG_BASE_URL}/${movie.backdrop_path}`;
@@ -29,7 +28,7 @@ app.get('/api/v1/movies', (req, res) => {
     });
 
     const [first, ...tail] = movies;
-    publishNewMovie(name, tail);
+    publishNewMovie(token, tail);
 
     const result = Object.assign({}, first, {listening_token: token});
     res.json(result);
@@ -42,10 +41,10 @@ const publishNewMovie = (token, movies) => {
       const [first, ...tail] = movies;
       const event = Object.assign({}, first, {status: 'active'});
       io.sockets.emit(`movies.${token}`, JSON.stringify(event));
-      publishNewMovie(name, tail);
+      publishNewMovie(token, tail);
     }, 5000);
   } else {
-    io.sockets.emit(`movies.${name}`, JSON.stringify({status: 'terminated'}));
+    io.sockets.emit(`movies.${token}`, JSON.stringify({status: 'terminated'}));
   }
 };
 
